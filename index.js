@@ -1,4 +1,4 @@
-//*eslint-disable*/
+/*eslint-disable*/
 /* eslint linebreak-style: ['error', 'windows'] */
 
 const laptops = [
@@ -133,19 +133,35 @@ filterForm.addEventListener('submit', handleSubmit);
 
 function handleSubmit(e) {
   e.preventDefault();
-  const filter = { size: [], color: [], release_date: [] };
-  const listOfChecked = filterForm.querySelectorAll('input[type=checkbox]:checked');
-  Array.prototype.forEach.call(listOfChecked, item => {filter[item.getAttribute('name')].push(item.getAttribute('value')) });
+  
+  const filter = makeFilter();
 
-  const filteredList = laptops.filter( ({size, color, release_date}) => {
-    const sizeIsNotChecked = filter.size.length === 0;
-    const colorIsNotChecked = filter.color.length === 0;
-    const releaseDateIsNotChecked = filter.release_date.length === 0;
+  const filteredList = laptops.filter(item =>{
 
-    return (sizeIsNotChecked || filter.size.includes('' + size)) &&
-           (colorIsNotChecked || filter.color.includes(color)) &&
-           (releaseDateIsNotChecked || filter.release_date.includes('' + release_date));
-  });
+    const filterKeys = Object.keys(filter);
+    const isMatches = filterKeys.reduce( (acc, curr) => {
+      const isMatchesParticularProperty = acc && ( !filter[curr].length || filter[curr].includes('' + item[curr]) );
+      //                             ни один чекбокс в группе не выбран или значение из объекта по ключу есть в соотв. массиве фильтра
+      return isMatchesParticularProperty;
+    }, true)
+
+    return isMatches;
+
+  }
+  );
+
+  //console.log(filteredList);
+  
+  // const filteredList = laptops.filter( ({size, color, release_date}) => {
+  //   const sizeIsNotChecked = filter.size.length === 0;
+  //   const colorIsNotChecked = filter.color.length === 0;
+  //   const releaseDateIsNotChecked = filter.release_date.length === 0;
+
+  //   return (sizeIsNotChecked || filter.size.includes('' + size)) &&
+  //          (colorIsNotChecked || filter.color.includes(color)) &&
+  //          (releaseDateIsNotChecked || filter.release_date.includes('' + release_date));
+  // }
+  // );
   renderList(filteredList);
 
 
@@ -165,4 +181,22 @@ function renderList(list) {
   const markup = list.reduce((acc, item) => acc + template(item), '');
   const container = document.querySelector('#card-container');
   container.innerHTML = markup;
+}
+
+
+
+function makeFilter() {
+  const filterObj = {};
+  const listOfCheckboxes = filterForm.querySelectorAll('input[type=checkbox]');
+
+  Array.prototype.forEach.call(listOfCheckboxes, (item) => {
+    const name = item.getAttribute('name');
+    if (!filterObj[name]) {
+      filterObj[name] = [];
+    }
+    if (item.matches('input[type=checkbox]:checked')) {
+      filterObj[name].push(item.getAttribute('value'));
+    }
+  });
+  return filterObj;
 }
