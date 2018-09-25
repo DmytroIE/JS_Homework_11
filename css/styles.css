@@ -29,7 +29,6 @@ aside {
 main {
   flex-grow: 1;
   background-color: #eef;
-
 }
 
 .products {
@@ -39,7 +38,6 @@ main {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
-  /* justify-content: space-between; */
 }
 
 .products__card {
